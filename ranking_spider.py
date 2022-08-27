@@ -1,6 +1,6 @@
 import scrapy
 from schemas import AtcoderUser
-from utils import get_text
+from parser_utils import get_text
 
 class RankingSpider(scrapy.Spider):
     name = 'rankingspider'
@@ -27,9 +27,9 @@ class RankingSpider(scrapy.Spider):
                 rating=rating,
             )
 
-            print([rank, user, birth_year, rating])
-            # print(dir(user))
-            yield {'title': user_row.css('::text').get()}
+            yield { 'user': user }
 
-        # for next_page in response.css('a.next'):
-        #     yield response.follow(next_page, self.parse)
+        next_page = response.css('ul.pagination li.active + li a::attr(href)').get()
+        print('next_page', next_page)
+        if next_page is not None:
+            yield response.follow(next_page, self.parse)
